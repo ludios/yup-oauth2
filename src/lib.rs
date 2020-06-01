@@ -92,4 +92,4 @@ pub use crate::service_account::ServiceAccountKey;
 
 #[doc(inline)]
 pub use crate::error::Error;
-pub use crate::types::{AccessToken, ApplicationSecret, ConsoleApplicationSecret};
+pub use crate::types::{AccessToken, TokenInfo, ApplicationSecret, ConsoleApplicationSecret};

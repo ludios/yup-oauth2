@@ -7,19 +7,23 @@ use serde::{Deserialize, Serialize};
 /// Bearer tokens. Other types of tokens are not supported.
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Deserialize, Serialize)]
 pub struct AccessToken {
-    value: String,
-    expires_at: Option<DateTime<Utc>>,
+    info: TokenInfo
 }
 
 impl AccessToken {
     /// A string representation of the access token.
     pub fn as_str(&self) -> &str {
-        &self.value
+        &self.info.access_token
     }
 
     /// The time the access token will expire, if any.
     pub fn expiration_time(&self) -> Option<DateTime<Utc>> {
-        self.expires_at
+        self.info.expires_at
+    }
+
+    /// The `TokenInfo` for this `AccessToken`.
+    pub fn info(&self) -> &TokenInfo {
+        &self.info
     }
 
     /// Determine if the access token is expired.
@@ -29,7 +33,7 @@ impl AccessToken {
     pub fn is_expired(&self) -> bool {
         // Consider the token expired if it's within 1 minute of it's expiration
         // time.
-        self.expires_at
+        self.expiration_time()
             .map(|expiration_time| expiration_time - chrono::Duration::minutes(1) <= Utc::now())
             .unwrap_or(false)
     }
@@ -44,8 +48,7 @@ impl AsRef<str> for AccessToken {
 impl From<TokenInfo> for AccessToken {
     fn from(value: TokenInfo) -> Self {
         AccessToken {
-            value: value.access_token,
-            expires_at: value.expires_at,
+            info: value
         }
     }
 }
@@ -55,18 +58,19 @@ impl From<TokenInfo> for AccessToken {
 /// It is produced by all authentication flows.
 /// It authenticates certain operations, and must be refreshed once
 /// it reached it's expiry date.
-#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
-pub(crate) struct TokenInfo {
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Deserialize, Serialize)]
+pub struct TokenInfo {
     /// used when authenticating calls to oauth2 enabled services.
-    pub(crate) access_token: String,
+    pub access_token: String,
     /// used to refresh an expired access_token.
-    pub(crate) refresh_token: Option<String>,
+    pub refresh_token: Option<String>,
     /// The time when the token expires.
-    pub(crate) expires_at: Option<DateTime<Utc>>,
+    pub expires_at: Option<DateTime<Utc>>,
 }
 
 impl TokenInfo {
-    pub(crate) fn from_json(json_data: &[u8]) -> Result<TokenInfo, Error> {
+    /// Create a `TokenInfo` from encoded JSON
+    pub fn from_json(json_data: &[u8]) -> Result<TokenInfo, Error> {
         #[derive(Deserialize)]
         struct RawToken {
             access_token: String,
