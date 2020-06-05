@@ -59,7 +59,7 @@ fn decode_rsa_key(pem_pkcs8: &str) -> Result<PrivateKey, io::Error> {
 ///
 /// You can use `helpers::read_service_account_key()` as a quick way to read a JSON client
 /// secret into a ServiceAccountKey.
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct ServiceAccountKey {
     #[serde(rename = "type")]
     /// key_type
