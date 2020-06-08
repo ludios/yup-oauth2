@@ -9,7 +9,7 @@ use url::form_urlencoded;
 /// Refresh an expired access token, as obtained by any other authentication flow.
 /// This flow is useful when your `Token` is expired and allows to obtain a new
 /// and valid access token.
-pub(crate) struct RefreshFlow;
+pub struct RefreshFlow;
 
 impl RefreshFlow {
     /// Attempt to refresh the given token, and obtain a new, valid one.
@@ -26,7 +26,7 @@ impl RefreshFlow {
     ///
     /// # Examples
     /// Please see the crate landing page for an example.
-    pub(crate) async fn refresh_token<C>(
+    pub async fn refresh_token<C>(
         client: &hyper::Client<C>,
         client_secret: &ApplicationSecret,
         refresh_token: &str,
